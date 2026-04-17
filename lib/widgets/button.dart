@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
 
-class Button extends StatefulWidget {
+class Button extends StatelessWidget {
   final Color backgroundColor;
   final String txt;
-  Button({super.key, required this.backgroundColor, required this.txt});
+  final VoidCallback onPressed;
+  const Button(
+      {super.key,
+      required this.backgroundColor,
+      required this.txt,
+      required this.onPressed});
 
-  @override
-  State<Button> createState() => _ButtonState();
-}
-
-class _ButtonState extends State<Button> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: widget.backgroundColor,
-          side: BorderSide(
-            color: Colors.grey.shade500,
-            width: 1,
-          ),
-          minimumSize: const Size(500, 50)),
-      child: Text(
-        widget.txt,
-        style: const TextStyle(fontSize: 14, color: Colors.white),
+    return SizedBox(
+      height: 46,
+      width: MediaQuery.sizeOf(context).width,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+            backgroundColor: backgroundColor,
+            side: BorderSide(
+              color: Colors.grey.shade500,
+              width: 1,
+            ),
+            ),
+        child: Text(
+          txt,
+          style: const TextStyle(fontSize: 14, color: Colors.white),
+        ),
       ),
     );
   }

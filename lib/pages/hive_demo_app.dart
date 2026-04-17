@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_demo/pages/database.dart';
 import 'package:hive_demo/widgets/button.dart';
 import 'package:hive_demo/widgets/container_list.dart';
 
@@ -10,6 +12,38 @@ class HiveDemoApp extends StatefulWidget {
 }
 
 class _HiveDemoAppState extends State<HiveDemoApp> {
+  final _taskController = TextEditingController();
+  final _myBox = Hive.box('my box');
+
+  HiveDataBase db = HiveDataBase();
+
+  @override
+  void initState() {
+    super.initState();
+    if (_myBox.get('TODOLIST') == null) {
+      db.createdInitialData();
+    } else {
+      db.loadData();
+    }
+  }
+
+  //save new task
+  void saveNewTask() {
+    setState(() {
+      db.taskList.add(_taskController.text);
+      _taskController.clear();
+      db.updateData();
+    });
+  }
+
+  //remove task
+  void removeTask(int index) {
+    setState(() {
+      db.taskList.removeAt(index);
+      db.updateData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,30 +64,53 @@ class _HiveDemoAppState extends State<HiveDemoApp> {
             const SizedBox(
               height: 10,
             ),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                  side: BorderSide(
-                    color: Colors.grey.shade500,
-                    width: 1,
+            SizedBox(
+              height: 46,
+              child: TextField(
+                controller: _taskController,
+                decoration: InputDecoration(
+                  labelText: 'Enter your task',
+                  labelStyle: const TextStyle(
+                    color: Colors.grey, // binafsha rang
+                    fontSize: 14,
                   ),
-                  minimumSize: const Size(500, 50)),
-              child: const Text(
-                'Enter your task',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(40),
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                      width: 1.2,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(40),
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                      width: 1.2,
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(
               height: 20,
             ),
             Button(
-                backgroundColor: const Color.fromARGB(255, 132, 83, 218),
-                txt: 'Done'),
+              backgroundColor: const Color.fromARGB(255, 132, 83, 218),
+              txt: 'Done',
+              onPressed: saveNewTask,
+            ),
             const SizedBox(
               height: 10,
             ),
-            Button(backgroundColor: Colors.grey, txt: 'Remove'),
+            Button(
+              backgroundColor: Colors.grey,
+              txt: 'Remove',
+              onPressed: () {
+                if (db.taskList.isNotEmpty) {
+                  removeTask(db.taskList.length - 1);
+                }
+              },
+            ),
             const SizedBox(
               height: 20,
             ),
@@ -67,7 +124,10 @@ class _HiveDemoAppState extends State<HiveDemoApp> {
             const SizedBox(
               height: 10,
             ),
-            ContainerList(),
+            ContainerList(
+              taskList: db.taskList,
+              onRemove: removeTask,
+            ),
           ],
         ),
       ),

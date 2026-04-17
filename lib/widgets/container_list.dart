@@ -1,30 +1,38 @@
+// container_list.dart
 import 'package:flutter/material.dart';
 
-class ContainerList extends StatefulWidget {
-  const ContainerList({super.key});
+class ContainerList extends StatelessWidget {
+  final List<String> taskList;
+  final Function(int) onRemove; 
 
-  @override
-  State<ContainerList> createState() => _ContainerListState();
-}
+  const ContainerList({
+    super.key,
+    required this.taskList,
+    required this.onRemove, 
+  });
 
-class _ContainerListState extends State<ContainerList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 380,
+      height: 370,
       width: MediaQuery.sizeOf(context).width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-            border: Border.all(
-          color: Colors.grey,
-          width: 1.5, 
-        ),
+        border: Border.all(color: Colors.grey, width: 1.5),
       ),
       child: SingleChildScrollView(
         child: Column(
-          children: [
-
-          ],
+          children: List.generate(
+            taskList.length,
+            (index) => ListTile(
+              title: Text(taskList[index]),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete, color: Colors.grey),
+                onPressed: () =>
+                    onRemove(index), 
+              ),
+            ),
+          ),
         ),
       ),
     );
